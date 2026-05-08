@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sera Mimari Görünümü - 3D Tasarım</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .canvas-section {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .canvas-section h2 {
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+            font-size: 1.3em;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .specifications {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .specifications h2 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.3em;
+        }
+
+        .spec-group {
+            margin-bottom: 20px;
+        }
+
+        .spec-group h3 {
+            color: #667eea;
+            font-size: 1em;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.95em;
+        }
+
+        .spec-item:last-child {
+            border-bottom: none;
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .spec-value {
+            color: #764ba2;
+            font-weight: 700;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f9f9f9;
+            border-top: 2px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .controls button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .footer {
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .legend {
+            margin-top: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.85em;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏗️ SERA PROJESİ - YAPISAL TASARIM</h1>
+            <p>100m x 12m Metalden Beşik Çatı Sera Mimari Görünümü</p>
+        </div>
+
+        <div class="content">
+            <!-- Sol Taraf - Görselleştirme -->
+            <div>
+                <div class="canvas-section">
+                    <h2>Ön Görünüş (Ölçek: 1:500)</h2>
+                    <canvas id="frontViewCanvas" width="450" height="350"></canvas>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #87CEEB;"></div>
+                            <span>Çatı Panelleri</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #FF6B6B;"></div>
+                            <span>Ana Çelik Çerçeve</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #4ECDC4;"></div>
+                            <span>Destekleyici Kolonlar</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #95E1D3;"></div>
+                            <span>Temel</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="canvas-section" style="margin-top: 20px;">
+                    <h2>Yan Görünüş (Ölçek: 1:500)</h2>
+                    <canvas id="sideViewCanvas" width="450" height="350"></canvas>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #95E1D3;"></div>
+                            <span>Temel (1.86m x 1.86m)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #4ECDC4;"></div>
+                            <span>Kolon Yüksekliği</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #87CEEB;"></div>
+                            <span>Çatı (30°)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Taraf - Teknik Özellikler -->
+            <div class="specifications">
+                <h2>📊 Teknik Özellikler</h2>
+
+                <div class="spec-group">
+                    <h3>📐 Sera Boyutları</h3>
+                    <div class="spec-item">
+                        <span class="spec-label">Uzunluk</span>
+                        <span class="spec-value">100.00 m</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Genişlik</span>
+                        <span class="spec-value">12.00 m</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Tabanı Alanı</span>
+                        <span class="spec-value">1,200.00 m²</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Çatı Açısı</span>
+                        <span class="spec-value">30.00°</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Çatı Yüzey Alanı</span>
+                        <span class="spec-value">1,298.08 m²</span>
+                    </div>
+                </div>
+
+                <div class="spec-group">
+                    <h3>⚖️ Yükler</h3>
+                    <div class="spec-item">
+                        <span class="spec-label">Canlı Yük</span>
+                        <span class="spec-value">100 kg</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Kar Yükü</span>
+                        <span class="spec-value">75 kg</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Rüzgar Hızı</span>
+                        <span class="spec-value">12 m/s</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Rüzgar Basıncı</span>
+                        <span class="spec-value">88.20 Pa</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Rüzgar Kuvveti</span>
+                        <span class="spec-value">114.43 kN</span>
+                    </div>
+                </div>
+
+                <div class="spec-group">
+                    <h3>🔩 Çelik Profil</h3>
+                    <div class="spec-item">
+                        <span class="spec-label">Akma Dayanımı</span>
+                        <span class="spec-value">250 MPa</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Güvenlik Faktörü</span>
+                        <span class="spec-value">1.50</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">İzin Verilen Gerilme</span>
+                        <span class="spec-value">166.67 MPa</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Gerekli Kesit Alanı</span>
+                        <span class="spec-value">42.15 cm²</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Önerilen Profil</span>
+                        <span class="spec-value">IPE 270</span>
+                    </div>
+                </div>
+
+                <div class="spec-group">
+                    <h3>⚙️ Yapı Ağırlığı</h3>
+                    <div class="spec-item">
+                        <span class="spec-label">Metal Çerçeve</span>
+                        <span class="spec-value">64.90 ton</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Toplam Tasarım Yükü</span>
+                        <span class="spec-value">866.02 kN</span>
+                    </div>
+                </div>
+
+                <div class="spec-group">
+                    <h3>🏗️ Temel Tasarımı</h3>
+                    <div class="spec-item">
+                        <span class="spec-label">Temel Kenarı</span>
+                        <span class="spec-value">1.86 m</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Temel Derinliği</span>
+                        <span class="spec-value">1.00 m</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Zemin Taşıma Kapasitesi</span>
+                        <span class="spec-value">25 kPa</span>
+                    </div>
+                </div>
+
+                <div class="spec-group">
+                    <h3>📦 Malzeme</h3>
+                    <div class="spec-item">
+                        <span class="spec-label">Çatı Paneli</span>
+                        <span class="spec-value">Polycarbonate</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Çerçeve</span>
+                        <span class="spec-value">Çelik (S275)</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Temel</span>
+                        <span class="spec-value">Beton (C25)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-primary" onclick="drawAllViews()">🔄 Görünümleri Yenile</button>
+            <button class="btn-secondary" onclick="downloadImage()">📥 Görüntü İndir</button>
+            <button class="btn-secondary" onclick="window.print()">🖨️ Yazdır</button>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 - Sera Projelendirme Sistemi | Hesaplamalar TS 648 ve TS EN 1993 standartlarına göre yapılmıştır.</p>
+        </div>
+    </div>
+
+    <script>
+        // Ön Görünüş Çizimi
+        function drawFrontView() {
+            const canvas = document.getElementById('frontViewCanvas');
+            const ctx = canvas.getContext('2d');
+            const scale = 2; // 2 piksel = 1 birim
+            const offsetX = 50;
+            const offsetY = 50;
+
+            // Arka plan
+            ctx.fillStyle = '#f0f8ff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Göksel
+            ctx.fillStyle = '#e0f4ff';
+            ctx.fillRect(0, 0, canvas.width, 100);
+
+            // Yer/Zemin
+            ctx.fillStyle = '#8B7355';
+            ctx.fillRect(0, 280, canvas.width, canvas.height - 280);
+
+            // Temel
+            ctx.fillStyle = '#95E1D3';
+            ctx.fillRect(offsetX + 50, 270, 12 * scale + 100, 20);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(offsetX + 50, 270, 12 * scale + 100, 20);
+
+            // Kolonlar
+            ctx.fillStyle = '#4ECDC4';
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#333';
+            
+            // Sol kolon
+            ctx.fillRect(offsetX + 50, 180, 8, 90);
+            ctx.strokeRect(offsetX + 50, 180, 8, 90);
+            
+            // Sağ kolon
+            ctx.fillRect(offsetX + 50 + 12 * scale + 92, 180, 8, 90);
+            ctx.strokeRect(offsetX + 50 + 12 * scale + 92, 180, 8, 90);
+
+            // Beşik Çatı
+            const roofAngle = 30 * Math.PI / 180;
+            const roofHeight = (12 / 2) * Math.tan(roofAngle) * scale;
+            const roofWidth = 12 * scale;
+
+            // Çatı panelleri
+            ctx.fillStyle = '#87CEEB';
+            ctx.beginPath();
+            ctx.moveTo(offsetX + 54, 180); // Sol alt
+            ctx.lineTo(offsetX + 54 + roofWidth / 2, 180 - roofHeight); // Tepe
+            ctx.lineTo(offsetX + 54 + roofWidth, 180); // Sağ alt
+            ctx.lineTo(offsetX + 54 + roofWidth, 190); // Sağ dış
+            ctx.lineTo(offsetX + 54 + roofWidth / 2, 190 - roofHeight); // Tepe dış
+            ctx.lineTo(offsetX + 54, 190); // Sol dış
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Çatı çerçevesi (kırmızı çizgiler)
+            ctx.strokeStyle = '#FF6B6B';
+            ctx.lineWidth = 2;
+            // Sol eğim
+            ctx.beginPath();
+            ctx.moveTo(offsetX + 54, 180);
+            ctx.lineTo(offsetX + 54 + roofWidth / 2, 180 - roofHeight);
+            ctx.stroke();
+            
+            // Sağ eğim
+            ctx.beginPath();
+            ctx.moveTo(offsetX + 54 + roofWidth / 2, 180 - roofHeight);
+            ctx.lineTo(offsetX + 54 + roofWidth, 180);
+            ctx.stroke();
+
+            // Ölçü işaretleri
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('12 m', offsetX + 54 + roofWidth / 2, 320);
+
+            ctx.font = '10px Arial';
+            ctx.fillText('Ön Görünüş (1:500)', canvas.width / 2, 340);
+        }
+
+        // Yan Görünüş Çizimi
+        function drawSideView() {
+            const canvas = document.getElementById('sideViewCanvas');
+            const ctx = canvas.getContext('2d');
+            const scale = 1.5; // 1.5 piksel = 1 meter
+            const offsetX = 50;
+            const offsetY = 80;
+
+            // Arka plan
+            ctx.fillStyle = '#f0f8ff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Göksel
+            ctx.fillStyle = '#e0f4ff';
+            ctx.fillRect(0, 0, canvas.width, 100);
+
+            // Yer/Zemin
+            ctx.fillStyle = '#8B7355';
+            ctx.fillRect(0, 250, canvas.width, canvas.height - 250);
+
+            // Temel
+            const foundationWidth = 1.86 * scale;
+            const foundationX = offsetX + 150;
+            ctx.fillStyle = '#95E1D3';
+            ctx.fillRect(foundationX, 245, foundationWidth, 20);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(foundationX, 245, foundationWidth, 20);
+            
+            // Temel derinliği gösterimi
+            ctx.strokeStyle = '#666';
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(foundationX - 25, 265);
+            ctx.lineTo(foundationX - 25, 265 + 1 * scale);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            ctx.fillStyle = '#666';
+            ctx.font = '9px Arial';
+            ctx.fillText('1m', foundationX - 35, 290);
+
+            // Kolon yüksekliği
+            const columnHeight = 6 * scale; // Yaklaşık kolon yüksekliği
+            ctx.fillStyle = '#4ECDC4';
+            ctx.fillRect(foundationX + foundationWidth / 2 - 4, 245 - columnHeight, 8, columnHeight);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(foundationX + foundationWidth / 2 - 4, 245 - columnHeight, 8, columnHeight);
+
+            // Beşik Çatı (yan görünüş)
+            const roofAngle = 30 * Math.PI / 180;
+            const roofHeight = (100 / 2) * Math.tan(roofAngle) * scale / 10; // Uzunluk çok olduğu için ölçekliyoruz
+            const roofBase = 100 * scale / 10;
+
+            // Çatı paneli
+            ctx.fillStyle = '#87CEEB';
+            ctx.beginPath();
+            ctx.moveTo(offsetX, 245 - columnHeight); // Sol alt
+            ctx.lineTo(offsetX + roofBase / 2, 245 - columnHeight - roofHeight); // Tepe
+            ctx.lineTo(offsetX + roofBase, 245 - columnHeight); // Sağ alt
+            ctx.lineTo(offsetX + roofBase, 245 - columnHeight + 10); // Sağ dış
+            ctx.lineTo(offsetX + roofBase / 2, 245 - columnHeight - roofHeight + 10); // Tepe dış
+            ctx.lineTo(offsetX, 245 - columnHeight + 10); // Sol dış
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Çatı çerçevesi
+            ctx.strokeStyle = '#FF6B6B';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(offsetX, 245 - columnHeight);
+            ctx.lineTo(offsetX + roofBase / 2, 245 - columnHeight - roofHeight);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(offsetX + roofBase / 2, 245 - columnHeight - roofHeight);
+            ctx.lineTo(offsetX + roofBase, 245 - columnHeight);
+            ctx.stroke();
+
+            // Ölçü işaretleri
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('100 m', offsetX + roofBase / 2, 320);
+
+            ctx.font = '10px Arial';
+            ctx.fillText('Yan Görünüş (1:500)', canvas.width / 2, 340);
+        }
+
+        // Tüm görünümleri çiz
+        function drawAllViews() {
+            drawFrontView();
+            drawSideView();
+        }
+
+        // Görüntüyü indir
+        function downloadImage() {
+            const canvas1 = document.getElementById('frontViewCanvas');
+            const canvas2 = document.getElementById('sideViewCanvas');
+            
+            const link1 = document.createElement('a');
+            link1.download = 'sera-on-gorunues.png';
+            link1.href = canvas1.toDataURL();
+            link1.click();
+
+            setTimeout(() => {
+                const link2 = document.createElement('a');
+                link2.download = 'sera-yan-gorunues.png';
+                link2.href = canvas2.toDataURL();
+                link2.click();
+            }, 500);
+        }
+
+        // Sayfa yüklendiğinde çiz
+        window.addEventListener('load', drawAllViews);
+    </script>
+</body>
+</html>
